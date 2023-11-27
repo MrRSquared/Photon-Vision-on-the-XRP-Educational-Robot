@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private final ps4controller m_stick = new ps4controller(0);
   private final XRPDrivetrain m_drivetrain = new XRPDrivetrain();
 
   //Instantiate the led
@@ -136,9 +137,9 @@ public class Robot extends TimedRobot {
 double forwardSpeed;
         double rotationSpeed;
 
-        forwardSpeed = -xboxController.getRightY();
+        forwardSpeed = -m_stick.getRightY();
 
-        if (xboxController.getAButton()) {
+        if (m_stick.getAButton()) {
             // Vision-alignment mode
             // Query the latest result from PhotonVision
             var result = camera.getLatestResult();
@@ -153,7 +154,7 @@ double forwardSpeed;
             }
         } else {
             // Manual Driver Mode
-            rotationSpeed = xboxController.getLeftX();
+            rotationSpeed = m_stick.getLeftX();
         }
 
         // Use our forward/turn speeds to control the drivetrain
@@ -161,9 +162,9 @@ double forwardSpeed;
     }double forwardSpeed;
         double rotationSpeed;
 
-        forwardSpeed = -xboxController.getRightY();
+        forwardSpeed = -m_stick.getRightY();
 
-        if (xboxController.getAButton()) {
+        if (m_stick.getAButton()) {
             // Vision-alignment mode
             // Query the latest result from PhotonVision
             var result = camera.getLatestResult();
@@ -178,11 +179,11 @@ double forwardSpeed;
             }
         } else {
             // Manual Driver Mode
-            rotationSpeed = xboxController.getLeftX();
+            rotationSpeed = m_stick.getLeftX();
         }
 
         // Use our forward/turn speeds to control the drivetrain
-        drive.arcadeDrive(forwardSpeed, rotationSpeed);
+        m_drivetrain.arcadeDrive(forwardSpeed, rotationSpeed);
     }
 
 }
