@@ -6,10 +6,13 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,7 +28,7 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private final ps4controller m_stick = new ps4controller(0);
+  private final PS4Controller m_stick = new PS4Controller(0);
   private final XRPDrivetrain m_drivetrain = new XRPDrivetrain();
 
   //Instantiate the led
@@ -44,9 +47,19 @@ public class Robot extends TimedRobot {
     final double GOAL_RANGE_METERS = Units.feetToMeters(3);
 
     //Instantiate the camera for the result
-  //Change this to match your camera stream name
-  PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
+    //Change this to match your camera stream name
+    PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
+    // PID constants should be tuned per robot
+    final double LINEAR_P = 0.1;
+    final double LINEAR_D = 0.0;
+    PIDController forwardController = new PIDController(LINEAR_P, 0, LINEAR_D);
+
+    final double ANGULAR_P = 0.1;
+    final double ANGULAR_D = 0.0;
+    PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+
+    XboxController xboxController = new XboxController(0);
 
 
   /**
@@ -137,9 +150,9 @@ public class Robot extends TimedRobot {
 double forwardSpeed;
         double rotationSpeed;
 
-        forwardSpeed = -m_stick.getRightY();
+        forwardSpeed = -m_stick.getLeftY();
 
-        if (m_stick.getAButton()) {
+        if (m_stick.getCircleButton()) {
             // Vision-alignment mode
             // Query the latest result from PhotonVision
             var result = camera.getLatestResult();
@@ -147,44 +160,20 @@ double forwardSpeed;
             if (result.hasTargets()) {
                 // Calculate angular turn power
                 // -1.0 required to ensure positive PID controller effort _increases_ yaw
-                rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+                rotationSpeed = turnController.calculate(result.getBestTarget().getYaw(), 0);
             } else {
                 // If we have no targets, stay still.
                 rotationSpeed = 0;
             }
         } else {
             // Manual Driver Mode
-            rotationSpeed = m_stick.getLeftX();
-        }
-
-        // Use our forward/turn speeds to control the drivetrain
-        drive.arcadeDrive(forwardSpeed, rotationSpeed);
-    }double forwardSpeed;
-        double rotationSpeed;
-
-        forwardSpeed = -m_stick.getRightY();
-
-        if (m_stick.getAButton()) {
-            // Vision-alignment mode
-            // Query the latest result from PhotonVision
-            var result = camera.getLatestResult();
-
-            if (result.hasTargets()) {
-                // Calculate angular turn power
-                // -1.0 required to ensure positive PID controller effort _increases_ yaw
-                rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
-            } else {
-                // If we have no targets, stay still.
-                rotationSpeed = 0;
-            }
-        } else {
-            // Manual Driver Mode
-            rotationSpeed = m_stick.getLeftX();
+            rotationSpeed = -m_stick.getLeftX();
         }
 
         // Use our forward/turn speeds to control the drivetrain
         m_drivetrain.arcadeDrive(forwardSpeed, rotationSpeed);
-    }
+      
+
 
 }
 

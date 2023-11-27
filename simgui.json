@@ -16,6 +16,9 @@
     },
     "transitory": {
       "photonvision": {
+        "Arducam_OV9281_USB_Camera": {
+          "open": true
+        },
         "open": true,
         "photonvision": {
           "open": true
@@ -37,7 +40,6 @@
       "Subscribers": {
         "open": true
       }
-    },
-    "visible": true
+    }
   }
 }
