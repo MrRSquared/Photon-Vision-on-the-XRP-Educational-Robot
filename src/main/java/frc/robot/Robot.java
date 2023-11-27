@@ -29,10 +29,30 @@ public class Robot extends TimedRobot {
   //Instantiate the led
   private DigitalOutput m_userLed= new DigitalOutput(1);
 
-  //Instantiate the camera for theresult
-  //Change this to match your camera stream name
-  PhotonCamera camera = new PhotonCamera("PhotonCamera");
+ /** This section is for setting up the constants for aiming at the target.
+*/
 
+    // Constants such as camera and target height stored. Change per robot and goal!
+    final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(3);
+    final double TARGET_HEIGHT_METERS = Units.feetToMeters(2);
+    // Angle between horizontal and the camera.
+    final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
+
+    // How far from the target we want to be
+    final double GOAL_RANGE_METERS = Units.feetToMeters(3);
+
+    //Instantiate the camera for the result
+  //Change this to match your camera stream name
+  PhotonCamera camera = new PhotonCamera("Arducam");
+
+    // PID constants should be tuned per robot
+    final double LINEAR_P = 0.1;
+    final double LINEAR_D = 0.0;
+    PIDController forwardController = new PIDController(LINEAR_P, 0, LINEAR_D);
+
+    final double ANGULAR_P = 0.1;
+    final double ANGULAR_D = 0.0;
+    PIDController turnController = new PIDController(ANGULAR_P, 0, 
 
 
   /**
@@ -118,7 +138,61 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+double forwardSpeed;
+        double rotationSpeed;
+
+        forwardSpeed = -xboxController.getRightY();
+
+        if (xboxController.getAButton()) {
+            // Vision-alignment mode
+            // Query the latest result from PhotonVision
+            var result = camera.getLatestResult();
+
+            if (result.hasTargets()) {
+                // Calculate angular turn power
+                // -1.0 required to ensure positive PID controller effort _increases_ yaw
+                rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+            } else {
+                // If we have no targets, stay still.
+                rotationSpeed = 0;
+            }
+        } else {
+            // Manual Driver Mode
+            rotationSpeed = xboxController.getLeftX();
+        }
+
+        // Use our forward/turn speeds to control the drivetrain
+        drive.arcadeDrive(forwardSpeed, rotationSpeed);
+    }double forwardSpeed;
+        double rotationSpeed;
+
+        forwardSpeed = -xboxController.getRightY();
+
+        if (xboxController.getAButton()) {
+            // Vision-alignment mode
+            // Query the latest result from PhotonVision
+            var result = camera.getLatestResult();
+
+            if (result.hasTargets()) {
+                // Calculate angular turn power
+                // -1.0 required to ensure positive PID controller effort _increases_ yaw
+                rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+            } else {
+                // If we have no targets, stay still.
+                rotationSpeed = 0;
+            }
+        } else {
+            // Manual Driver Mode
+            rotationSpeed = xboxController.getLeftX();
+        }
+
+        // Use our forward/turn speeds to control the drivetrain
+        drive.arcadeDrive(forwardSpeed, rotationSpeed);
+    }
+
+}
 
   /** This function is called once when the robot is disabled. */
   @Override
