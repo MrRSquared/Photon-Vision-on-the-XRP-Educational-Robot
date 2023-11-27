@@ -25,8 +25,13 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private final XRPDrivetrain m_drivetrain = new XRPDrivetrain();
+
+  //Instantiate the led
   private DigitalOutput m_userLed= new DigitalOutput(1);
-  PhotonCamera camera = new PhotonCamera("HP_Wide_Vision_HD_Camera");
+
+  //Instantiate the camera for theresult
+  //Change this to match your camera stream name
+  PhotonCamera camera = new PhotonCamera("PhotonCamera");
 
 
 
@@ -39,6 +44,13 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+   //This code stops the default nt server and conncets to the photon server instead.
+   NetworkTableInstance inst = NetworkTableInstance.getDefault();
+   inst.stopServer();
+   // Change the IP address in the below function to the IP address you use to connect to the PhotonVision UI.
+   inst.setServer("localhost");
+   inst.startClient4("Robot Simulation");
 
    }
 
@@ -65,11 +77,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-   inst.stopServer();
-   // Change the IP address in the below function to the IP address you use to connect to the PhotonVision UI.
-   inst.setServer("localhost");
-   inst.startClient4("Robot Simulation");
   
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
@@ -87,14 +94,17 @@ public class Robot extends TimedRobot {
       case kDefaultAuto:
       default:
         // Put default auto code here
-        var result = camera.getLatestResult();
 
+        //To check photon, we will light the user led if we see a target.
+        //create the photon results variable
+        var result = camera.getLatestResult();
+        
+        //Do we have a reasult?
         if (result.hasTargets()) {
-            // Calculate angular turn power
-            // -1.0 required to ensure positive PID controller effort _increases_ yaw
+            // Yes, so light the led
             m_userLed.set(true);
         } else {
-            // If we have no targets, stay still.
+            // If we have no targets, turn the led off
             m_userLed.set(false);
         }
 
