@@ -40,6 +40,13 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+   //This code stops the default nt server and conncets to the photon server instead.
+   NetworkTableInstance inst = NetworkTableInstance.getDefault();
+   inst.stopServer();
+   // Change the IP address in the below function to the IP address you use to connect to the PhotonVision UI.
+   inst.setServer("localhost");
+   inst.startClient4("Robot Simulation");
+
    }
 
   /**
@@ -65,11 +72,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-   inst.stopServer();
-   // Change the IP address in the below function to the IP address you use to connect to the PhotonVision UI.
-   inst.setServer("localhost");
-   inst.startClient4("Robot Simulation");
   
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
