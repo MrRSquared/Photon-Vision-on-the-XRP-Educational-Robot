@@ -25,8 +25,13 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private final XRPDrivetrain m_drivetrain = new XRPDrivetrain();
+
+  //Instantiate the led
   private DigitalOutput m_userLed= new DigitalOutput(1);
-  PhotonCamera camera = new PhotonCamera("HP_Wide_Vision_HD_Camera");
+
+  //Instantiate the camera for theresult
+  //Change this to match your camera stream name
+  PhotonCamera camera = new PhotonCamera("PhotonCamera");
 
 
 
