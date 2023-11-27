@@ -89,14 +89,17 @@ public class Robot extends TimedRobot {
       case kDefaultAuto:
       default:
         // Put default auto code here
-        var result = camera.getLatestResult();
 
+        //To check photon, we will light the user led if we see a target.
+        //create the photon results variable
+        var result = camera.getLatestResult();
+        
+        //Do we have a reasult?
         if (result.hasTargets()) {
-            // Calculate angular turn power
-            // -1.0 required to ensure positive PID controller effort _increases_ yaw
+            // Yes, so light the led
             m_userLed.set(true);
         } else {
-            // If we have no targets, stay still.
+            // If we have no targets, turn the led off
             m_userLed.set(false);
         }
 
