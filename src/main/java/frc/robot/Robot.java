@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -43,16 +44,8 @@ public class Robot extends TimedRobot {
 
     //Instantiate the camera for the result
   //Change this to match your camera stream name
-  PhotonCamera camera = new PhotonCamera("Arducam");
+  PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
-    // PID constants should be tuned per robot
-    final double LINEAR_P = 0.1;
-    final double LINEAR_D = 0.0;
-    PIDController forwardController = new PIDController(LINEAR_P, 0, LINEAR_D);
-
-    final double ANGULAR_P = 0.1;
-    final double ANGULAR_D = 0.0;
-    PIDController turnController = new PIDController(ANGULAR_P, 0, 
 
 
   /**
