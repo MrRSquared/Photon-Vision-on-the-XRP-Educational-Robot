@@ -42,6 +42,7 @@ wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
 //Sets the XRP Client Host
+//This is the ip of my XRP. You should change yours accordingly
 wpi.sim.envVar("HALSIMXRP_HOST", "192.168.1.132")
 wpi.sim.addXRPClient().defaultEnabled = true
 
