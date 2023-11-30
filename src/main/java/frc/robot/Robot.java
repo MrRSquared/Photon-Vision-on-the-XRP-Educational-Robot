@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -39,16 +38,16 @@ public class Robot extends TimedRobot {
 
     // Constants such as camera and target height stored. Change per robot and goal!
     final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(3);
-    final double TARGET_HEIGHT_METERS = Units.feetToMeters(2);
+    final double TARGET_HEIGHT_METERS = Units.inchesToMeters(0);
     // Angle between horizontal and the camera.
     final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
 
     // How far from the target we want to be
-    final double GOAL_RANGE_METERS = Units.feetToMeters(3);
+    final double GOAL_RANGE_METERS = Units.feetToMeters(1);
 
     //Instantiate the camera for the result
     //Change this to match your camera stream name
-    PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
+    PhotonCamera camera = new PhotonCamera("mmal_service_16.1");
 
     // PID constants should be tuned per robot
     final double LINEAR_P = 0.1;
@@ -57,10 +56,8 @@ public class Robot extends TimedRobot {
 
     final double ANGULAR_P = 0.1;
     final double ANGULAR_D = 0.0;
-    PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
-
-    XboxController xboxController = new XboxController(0);
-
+    final double ANGULAR_I = 0.0;
+    PIDController turnController = new PIDController(ANGULAR_P, ANGULAR_I, ANGULAR_D);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -89,7 +86,11 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    turnController.setD(SmartDashboard.getNumber("turn P", ANGULAR_P));
+    turnController.setI(SmartDashboard.getNumber("Angular I", ANGULAR_I));
+    turnController.setD(SmartDashboard.getNumber("Angular D", ANGULAR_D));
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -124,16 +125,21 @@ public class Robot extends TimedRobot {
 
         //To check photon, we will light the user led if we see a target.
         //create the photon results variable
-        var result = camera.getLatestResult();
-        
-        //Do we have a reasult?
+        try {
+          var result = camera.getLatestResult();
+          System.out.println("connected ");
+          //Do we have a reasult?
         if (result.hasTargets()) {
             // Yes, so light the led
+            System.out.println("target achieved");
             m_userLed.set(true);
         } else {
             // If we have no targets, turn the led off
             m_userLed.set(false);
         }
+        } catch (Exception e) {
+          System.out.println(e);
+      }
 
         break;
     }
@@ -149,14 +155,15 @@ public class Robot extends TimedRobot {
 
 double forwardSpeed;
         double rotationSpeed;
-
         forwardSpeed = -m_stick.getLeftY();
 
-        if (m_stick.getCircleButton()) {
-            // Vision-alignment mode
+        
             // Query the latest result from PhotonVision
             var result = camera.getLatestResult();
 
+            SmartDashboard.putData(turnController);
+        if (m_stick.getCircleButton()) {
+            // Vision-alignment mode
             if (result.hasTargets()) {
                 // Calculate angular turn power
                 // -1.0 required to ensure positive PID controller effort _increases_ yaw
@@ -194,5 +201,19 @@ double forwardSpeed;
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    double rotationSpeed;
+    var result = camera.getLatestResult();
+    if (result.hasTargets()) {
+                // Calculate angular turn power
+                // -1.0 required to ensure positive PID controller effort _increases_ yaw
+                rotationSpeed = turnController.calculate(result.getBestTarget().getYaw(), 0);
+            } else {
+                // If we have no targets, stay still.
+                rotationSpeed = 0;
+            }
+    // Use our forward/turn speeds to control the drivetrain
+    m_drivetrain.arcadeDrive(0, rotationSpeed);
+
+  }
 }
