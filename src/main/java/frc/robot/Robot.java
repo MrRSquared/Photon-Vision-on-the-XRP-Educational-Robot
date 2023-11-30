@@ -6,8 +6,11 @@ package frc.robot;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,7 +46,7 @@ public class Robot extends TimedRobot {
 
     //Instantiate the camera for the result
   //Change this to match your camera stream name
-  PhotonCamera camera = new PhotonCamera("Arducam");
+  PhotonCamera camera = new PhotonCamera("photonCam");
 
     // PID constants should be tuned per robot
     final double LINEAR_P = 0.1;
@@ -52,7 +55,8 @@ public class Robot extends TimedRobot {
 
     final double ANGULAR_P = 0.1;
     final double ANGULAR_D = 0.0;
-    PIDController turnController = new PIDController(ANGULAR_P, 0, 
+    PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+    final static PS4Controller driveController = new PS4Controller(0);
 
 
   /**
@@ -70,6 +74,7 @@ public class Robot extends TimedRobot {
    inst.stopServer();
    // Change the IP address in the below function to the IP address you use to connect to the PhotonVision UI.
    inst.setServer("localhost");
+   
    inst.startClient4("Robot Simulation");
 
    }
@@ -128,6 +133,8 @@ public class Robot extends TimedRobot {
             m_userLed.set(false);
         }
 
+        m_drivetrain.arcadeDrive(0, 0);
+
         break;
     }
   }
@@ -143,9 +150,9 @@ public class Robot extends TimedRobot {
 double forwardSpeed;
         double rotationSpeed;
 
-        forwardSpeed = -xboxController.getRightY();
+        forwardSpeed = -driveController.getLeftY();
 
-        if (xboxController.getAButton()) {
+        if (driveController.getCircleButton()) {
             // Vision-alignment mode
             // Query the latest result from PhotonVision
             var result = camera.getLatestResult();
@@ -160,37 +167,11 @@ double forwardSpeed;
             }
         } else {
             // Manual Driver Mode
-            rotationSpeed = xboxController.getLeftX();
+            rotationSpeed = driveController.getLeftX();
         }
 
         // Use our forward/turn speeds to control the drivetrain
-        drive.arcadeDrive(forwardSpeed, rotationSpeed);
-    }double forwardSpeed;
-        double rotationSpeed;
-
-        forwardSpeed = -xboxController.getRightY();
-
-        if (xboxController.getAButton()) {
-            // Vision-alignment mode
-            // Query the latest result from PhotonVision
-            var result = camera.getLatestResult();
-
-            if (result.hasTargets()) {
-                // Calculate angular turn power
-                // -1.0 required to ensure positive PID controller effort _increases_ yaw
-                rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
-            } else {
-                // If we have no targets, stay still.
-                rotationSpeed = 0;
-            }
-        } else {
-            // Manual Driver Mode
-            rotationSpeed = xboxController.getLeftX();
-        }
-
-        // Use our forward/turn speeds to control the drivetrain
-        drive.arcadeDrive(forwardSpeed, rotationSpeed);
-    }
+        m_drivetrain.arcadeDrive(forwardSpeed, -rotationSpeed);
 
 }
 
