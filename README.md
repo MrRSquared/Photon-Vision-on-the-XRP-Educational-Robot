@@ -44,7 +44,7 @@ $ sudo chmod +x install.sh
 $ sudo ./install.sh
 $ sudo reboot now
 ```
-- You may need to enable legacy camera options by typing the followingin ykur SSH shell.
+- You may need to enable legacy camera options by typing the following in your SSH shell.
 ```
 $ sudo raspi-config
 ```
@@ -58,4 +58,4 @@ $ ssh [user]@photonvision.local
 $ sudo mv [jar name].jar /opt/photonvision/photonvision.jar
 $ sudo systemctl restart photonvision.service
 ```
-After that, everything is working as expected for me.
+After that, everything is working as expected for me. I am currently powering the pi from a portable phone charger.I know brownouts could be a problem, so I thought it would be better to keep the power seperate for now.
