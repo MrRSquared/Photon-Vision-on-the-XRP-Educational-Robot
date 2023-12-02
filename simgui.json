@@ -17,6 +17,9 @@
     "transitory": {
       "photonvision": {
         "open": true,
+        "photonCam": {
+          "open": true
+        },
         "photonvision": {
           "open": true
         }
@@ -39,5 +42,8 @@
       },
       "open": true
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
