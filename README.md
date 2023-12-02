@@ -3,7 +3,7 @@ This repository shows how to use [Photon Vision](https://docs.photonvision.org/e
 
 It is experimental, but it is working for me thus far. YMMV :)
 
-I this works with WPILib 2024.1.1 Beta 2   Release.
+I got this working with WPILib 2024.1.1 Beta 2   Release.
 
 Basically, it uses Photon running as an [NT server host](https://docs.wpilib.org/en/latest/docs/xrp-robot/index.html) (either on the pc itself or on a coprocessor), and it can still connect to the XRP through websockets.
 
@@ -25,17 +25,17 @@ if(RobotBase.isSimulation()) {
 This connects the simulator to the server.
 The code above will connect to a server running on the host laptop running the wpilib software.
 
-You can take this a step further by running Photon on a coprocessor. I do not have access to a supported pi currently, but I did get Photon working on a Pi Zero2W (not the zero 1 or 1w. there is not a Java 11 build compatible with that one). Note, this is not officially supported, but it does work with a 32 or 64 bit image. 
+You can take this a step further by running Photon on a coprocessor. I do not have access to a supported pi currently, but I did get Photon working on a Pi Zero2W (not the zero 1 or 1w. There is not a Java 11 build compatible with that one). Note, this is not officially supported, but it does work with a 32 or 64 bit image. Also, running Photon does heat up the Pi and push its limits a bit. A heat sink may be a good idea.
 
 ## Pi Install
 
 Because Photon expects a non-wifi coprocessor, I ended up installing Photon Manually. 
 
-- I started by flashing a legacy light image (32 or 64 bit). I set up ssh and the wifi and password to connect to my home network (but you could set it to connect to the XRP Accesspoint as well) in the raspberry pi imager. 
+- I started by flashing a legacy light image (32 or 64 bit). I set up ssh and the wifi and password to connect to my home network (but you could set it to connect to the XRP Access point instead) in the raspberry pi imager. 
 
 - Then, I connected the pi camera to the pi and booted it. 
 
-- I found the ip address of the Pi using my router software, but you could use sniffing software to find it as well. 
+- I found the ip address of the Pi using my router software, but you could use sniffing software to find it. 
 
 - Using an SSH client, I connected to the Pi and ran the [Debian install commands from Photon's Docs](https://docs.photonvision.org/en/latest/docs/getting-started/installation/sw_install/other-coprocessors.html).
 ```Java
@@ -44,6 +44,12 @@ $ sudo chmod +x install.sh
 $ sudo ./install.sh
 $ sudo reboot now
 ```
+- You may need to enable legacy camera options by typing the followingin ykur SSH shell.
+```
+$ sudo raspi-config
+```
+Then selecting interface options, enable legacy camera support, and finally, exit, save, and reboot
+
 - I updated the Photon install to the 2024 Beta 3 using winscp. The gui of winscp skipped the first step in Photon's update directions.
 
 ```Java
@@ -52,3 +58,4 @@ $ ssh [user]@photonvision.local
 $ sudo mv [jar name].jar /opt/photonvision/photonvision.jar
 $ sudo systemctl restart photonvision.service
 ```
+After that, everything is working as expected for me.
