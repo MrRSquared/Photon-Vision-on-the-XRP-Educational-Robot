@@ -37,6 +37,18 @@ Because Photon expects a non-wifi coprocessor, I ended up installing Photon Manu
 
 - I found the ip address of the Pi using my router software, but you could use sniffing software to find it as well. 
 
-- Using an SSH client, I connected to the Pi and ran the Debian install commands from Photon's Docs.
+- Using an SSH client, I connected to the Pi and ran the [Debian install commands from Photon's Docs](https://docs.photonvision.org/en/latest/docs/getting-started/installation/sw_install/other-coprocessors.html).
+```Java
+$ wget https://git.io/JJrEP -O install.sh
+$ sudo chmod +x install.sh
+$ sudo ./install.sh
+$ sudo reboot now
+```
+- I updated the Photon install to the 2024 Beta 3 using winscp. The gui of winscp skipped the first step in Photon's update directions.
 
-- I updated the Photon install to the 2024 Beta 3
+```Java
+$ scp [jar name].jar [user]@photonvision.local:~/
+$ ssh [user]@photonvision.local
+$ sudo mv [jar name].jar /opt/photonvision/photonvision.jar
+$ sudo systemctl restart photonvision.service
+```
